@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.0.1",
   "keywords": [
     "strapi",
     "plugin",
@@ -50,7 +50,7 @@
   },
   "devDependencies": {
     "@strapi/sdk-plugin": "^5.3.2",
-    "@strapi/strapi": "^5.18.0",
+    "@strapi/strapi": "^5.19.0",
     "@strapi/typescript-utils": "^5.18.0",
     "@types/prismjs": "1.26.5",
     "@types/react": "^18",
@@ -65,11 +65,11 @@
   "peerDependencies": {
     "@strapi/design-system": "^2.0.0-rc.29",
     "@strapi/icons": "^2.0.0-rc.29",
-    "@strapi/strapi": "^5.18.0",
+    "@strapi/strapi": "^5.19.0",
     "prismjs": "1.30.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "react-intl": "^7.1.11",
+    "react-intl": "^6.6.2",
     "react-router-dom": "^6.0.0",
     "slate": "0.94.1",
     "slate-history": "0.93.0",

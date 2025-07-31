@@ -1,48 +1,59 @@
-import * as React from 'react';
+﻿import * as React from "react";
 
-import { Box, SingleSelect, SingleSelectOption } from '@strapi/design-system';
-import { CodeBlock as CodeBlockIcon } from '@strapi/icons';
-import * as Prism from 'prismjs';
-import { useIntl } from 'react-intl';
-import { BaseRange, Element, Editor, Node, NodeEntry, Transforms } from 'slate';
-import { useSelected, type RenderElementProps, useFocused, ReactEditor } from 'slate-react';
-import { styled } from 'styled-components';
+import { Box, SingleSelect, SingleSelectOption } from "@strapi/design-system";
+import { CodeBlock as CodeBlockIcon } from "@strapi/icons";
+import * as Prism from "prismjs";
 
-import { useBlocksEditorContext, type BlocksStore } from '../BlocksEditor';
-import { codeLanguages } from '../utils/constants';
-import { baseHandleConvert } from '../utils/conversions';
-import { pressEnterTwiceToExit } from '../utils/enterKey';
-import { CustomElement, CustomText, type Block } from '../utils/types';
+// Инициализируем Prism глобально для предотвращения ошибок
+if (typeof window !== "undefined") {
+  window.Prism = Prism;
+}
 
-// Загружаем основные языки + scala для исправления ошибки
-import 'prismjs/themes/prism-solarizedlight.css';
-import 'prismjs/components/prism-javascript';
-import 'prismjs/components/prism-jsx';
-import 'prismjs/components/prism-typescript';
-import 'prismjs/components/prism-tsx';
-import 'prismjs/components/prism-json';
-import 'prismjs/components/prism-css';
-import 'prismjs/components/prism-markdown';
-import 'prismjs/components/prism-bash';
-import 'prismjs/components/prism-python';
-import 'prismjs/components/prism-php';
-import 'prismjs/components/prism-sql';
-import 'prismjs/components/prism-yaml';
-import 'prismjs/components/prism-scala';
+import { useIntl } from "react-intl";
+import { BaseRange, Element, Editor, Node, NodeEntry, Transforms } from "slate";
+import { useSelected, type RenderElementProps, useFocused, ReactEditor } from "slate-react";
+import { styled } from "styled-components";
 
-// Убеждаемся, что scala загружен перед любыми расширениями
-if (!Prism.languages.scala) {
-  console.warn('Scala language not loaded, attempting to load it');
+import { useBlocksEditorContext, type BlocksStore } from "../BlocksEditor";
+import { codeLanguages } from "../utils/constants";
+import { baseHandleConvert } from "../utils/conversions";
+import { pressEnterTwiceToExit } from "../utils/enterKey";
+import { CustomElement, CustomText, type Block } from "../utils/types";
+
+// Безопасная загрузка компонентов Prism.js
+const loadPrismComponent = (componentName) => {
   try {
-    require('prismjs/components/prism-scala');
-  } catch (e) {
-    console.warn('Failed to load scala language:', e);
+    require(`prismjs/components/${componentName}`);
+  } catch (error) {
+    console.warn(`Failed to load Prism component: ${componentName}`, error);
   }
+};
+
+// Загружаем основные языки
+loadPrismComponent("prism-javascript");
+loadPrismComponent("prism-jsx");
+loadPrismComponent("prism-typescript");
+loadPrismComponent("prism-tsx");
+loadPrismComponent("prism-json");
+loadPrismComponent("prism-css");
+loadPrismComponent("prism-markdown");
+loadPrismComponent("prism-bash");
+loadPrismComponent("prism-python");
+loadPrismComponent("prism-php");
+loadPrismComponent("prism-sql");
+loadPrismComponent("prism-yaml");
+loadPrismComponent("prism-scala");
+
+// Загружаем тему
+try {
+  require("prismjs/themes/prism-solarizedlight.css");
+} catch (error) {
+  console.warn("Failed to load Prism theme:", error);
 }
 
 // Add custom type definitions
 interface CodeElement extends CustomElement {
-  type: 'code';
+  type: "code";
   language?: string;
   children: CustomText[];
 }
@@ -57,8 +68,8 @@ const isCodeElement = (node: Node): node is CodeElement => {
   return (
     !Editor.isEditor(node) && 
     Element.isElement(node) && 
-    'type' in node && 
-    node.type === 'code'
+    "type" in node && 
+    node.type === "code"
   );
 };
 
@@ -66,8 +77,8 @@ export const decorateCode = ([node, path]: NodeEntry) => {
   const ranges: BaseRangeCustom[] = [];
 
   // make sure it is an Slate Element
-  if (!Element.isElement(node) ||  'type' in node && 
-    node.type === 'code') return ranges;
+  if (!Element.isElement(node) ||  "type" in node && 
+    node.type === "code") return ranges;
   
   // transform the Element into a string
   const text = Node.string(node);
@@ -75,18 +86,18 @@ export const decorateCode = ([node, path]: NodeEntry) => {
   const decorateKey = language?.decorate ?? language?.value;
 
   // create "tokens" with "prismjs" and put them in "ranges"
-  if (decorateKey && decorateKey !== 'plaintext') {
-    const selectedLanguage = Prism.languages[decorateKey || 'plaintext'];
+  if (decorateKey && decorateKey !== "plaintext") {
+    const selectedLanguage = Prism.languages[decorateKey || "plaintext"];
     if (selectedLanguage) {
       try {
         const tokens = Prism.tokenize(text, selectedLanguage);
         let start = 0;
 
         for (const token of tokens) {
-          const length = typeof token === 'string' ? token.length : token.length;
+          const length = typeof token === "string" ? token.length : token.length;
           const end = start + length;
 
-          if (typeof token === 'string') {
+          if (typeof token === "string") {
             start = end;
             continue;
           }
@@ -99,7 +110,7 @@ export const decorateCode = ([node, path]: NodeEntry) => {
           start = end;
         }
       } catch (error) {
-        console.warn('Error tokenizing code:', error);
+        console.warn("Error tokenizing code:", error);
         // Если произошла ошибка, просто возвращаем код без подсветки
       }
     }
@@ -118,7 +129,7 @@ const CodeBlock = styled.pre`
   flex-shrink: 1;
 
   & > code {
-    font-family: 'SF Mono', SFMono-Regular, ui-monospace, 'DejaVu Sans Mono', Menlo, Consolas,
+    font-family: "SF Mono", SFMono-Regular, ui-monospace, "DejaVu Sans Mono", Menlo, Consolas,
       monospace;
     color: ${({ theme }) => theme.colors.neutral800};
     overflow: auto;
@@ -127,7 +138,7 @@ const CodeBlock = styled.pre`
 `;
 
 const CodeEditor = (props: CodeEditorProps) => {
-  const { editor } = useBlocksEditorContext('CodeEditor');
+  const { editor } = useBlocksEditorContext("CodeEditor");
   const editorIsFocused = useFocused();
   const imageIsSelected = useSelected();
   const { formatMessage } = useIntl();
@@ -163,7 +174,7 @@ const CodeEditor = (props: CodeEditorProps) => {
                 }
               );
             }}
-            value={(isCodeElement(props.element) && props.element.language) || 'plaintext'}
+            value={(isCodeElement(props.element) && props.element.language) || "plaintext"}
             onOpenChange={(open: boolean) => {
               setIsSelectOpen(open);
 
@@ -174,8 +185,8 @@ const CodeEditor = (props: CodeEditorProps) => {
             }}
             onCloseAutoFocus={(e: Event) => e.preventDefault()}
             aria-label={formatMessage({
-              id: 'components.Blocks.blocks.code.languageLabel',
-              defaultMessage: 'Select a language',
+              id: "components.Blocks.blocks.code.languageLabel",
+              defaultMessage: "Select a language",
             })}
           >
             {codeLanguages.map(({ value, label }) => (
@@ -190,35 +201,35 @@ const CodeEditor = (props: CodeEditorProps) => {
   );
 };
 
-const codeBlocks: Pick<BlocksStore, 'code'> = {
+const codeBlocks: Pick<BlocksStore, "code"> = {
   code: {
     renderElement: (props: RenderElementProps) => <CodeEditor {...props as CodeEditorProps} />,
     icon: CodeBlockIcon,
     label: {
-      id: 'components.Blocks.blocks.code',
-      defaultMessage: 'Code block',
+      id: "components.Blocks.blocks.code",
+      defaultMessage: "Code block",
     },
     // Update the matchNode function to accept Node type
     matchNode: (node: Node): node is CodeElement => {
       return (
         !Editor.isEditor(node) && 
         Element.isElement(node) && 
-        'type' in node && 
-        node.type === 'code'
+        "type" in node && 
+        node.type === "code"
       );
     },
     isInBlocksSelector: true,
     handleConvert(editor) {
       baseHandleConvert<CodeElement>(editor, { 
-        type: 'code', 
-        language: 'plaintext',
-        children: [{ type: 'text', text: '' } as CustomText]
+        type: "code", 
+        language: "plaintext",
+        children: [{ type: "text", text: "" } as CustomText]
       });
     },
     handleEnterKey(editor) {
       pressEnterTwiceToExit(editor);
     },
-    snippets: ['```'],
+    snippets: ["```"],
   },
 };
 

@@ -88,12 +88,12 @@
   "author": "Jorge Pizzati <jorge.pizzati@uvltd.tech>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/strapi-plugin-rich-text-blocks-extended.git"
+    "url": "https://github.com/A-mi13/strapi-plugin-rich-text-blocks-extended.git"
   },
   "bugs": {
-    "url": "https://github.com/your-username/strapi-plugin-rich-text-blocks-extended/issues"
+    "url": "https://github.com/A-mi13/strapi-plugin-rich-text-blocks-extended/issues"
   },
-  "homepage": "https://github.com/your-username/strapi-plugin-rich-text-blocks-extended#readme",
+  "homepage": "https://github.com/A-mi13/strapi-plugin-rich-text-blocks-extended#readme",
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=8.0.0"
